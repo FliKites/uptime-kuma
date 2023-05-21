@@ -1070,6 +1070,7 @@ message HealthCheckResponse {
             }
 
             if (this.isAdd || this.isClone) {
+                console.log("monitor ", this.monitor);
                 this.$root.add(this.monitor, async (res) => {
 
                     if (res.ok) {

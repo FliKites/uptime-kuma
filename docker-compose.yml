@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  uptime-kuma:
+    build: .
+    image: your_username/uptime-kuma
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+
+volumes:
+  uptime-kuma-data:
