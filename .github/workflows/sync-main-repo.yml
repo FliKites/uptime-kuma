@@ -17,10 +17,15 @@ jobs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
 
-    - name: Fetch from upstream
+    - name: Fetch from main upstream
       run: |
         git remote add upstream https://github.com/louislam/uptime-kuma.git
         git fetch upstream
+
+    - name: Fetch from mysql branch upstream
+      run: |
+        git remote add mysql_upstream https://github.com/FliKites/uptime-kuma.git
+        git fetch mysql_upstream mysql:mysql
 
     - name: Check for specific commit changes
       id: check_commit
@@ -37,6 +42,7 @@ jobs:
       run: |
         TIMESTAMP=$(date +%Y%m%d%H%M%S)
         BRANCH_NAME="mysql-${TIMESTAMP}"
+        git checkout mysql
         git checkout -b $BRANCH_NAME
         git merge upstream/master
         git push origin $BRANCH_NAME
