@@ -1,0 +1,42 @@
+name: Sync with Main Repo
+
+on:
+  schedule:
+    - cron:  '0 * * * *' # Runs every hour
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code 
+      uses: actions/checkout@v3
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+
+    - name: Fetch from upstream
+      run: |
+        git remote add upstream https://github.com/louislam/uptime-kuma.git
+        git fetch upstream
+
+    - name: Check for specific commit changes
+      id: check_commit
+      run: |
+        COMMIT_HASH="<YOUR COMMIT HASH>"
+        if git rev-list --quiet --grep "^${COMMIT_HASH}"; then
+          echo "::set-output name=changed::true"
+        else
+          echo "::set-output name=changed::false"
+        fi
+
+    - name: Create new branch and merge changes
+      if: steps.check_commit.outputs.changed == 'false'
+      run: |
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        BRANCH_NAME="mysql-${TIMESTAMP}"
+        git checkout -b $BRANCH_NAME
+        git merge upstream/master
+        git push origin $BRANCH_NAME
