@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { R } = require("redbean-node");
-const { setSetting, setting } = require("./util-server");
+const { setSetting, setting, getSettings } = require("./util-server");
 const { log, sleep } = require("../src/util");
 const knex = require("knex");
 
@@ -130,6 +130,7 @@ class Database {
         R.useBetterSQLite3 = false;
         const con = {
             host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
@@ -147,6 +148,19 @@ class Database {
             await R.autoloadModels("./server/model");
             console.log("auto loading models. done");
         }
+
+        let isBaseSetuped = false;
+        try {
+            isBaseSetuped = await setting("db_init");
+        } catch (e) {
+            console.log("first init we setting up base tables");
+        }
+
+        if (!isBaseSetuped) {
+            await this.importSQLFile("./db/kuma.sql");
+            await setSetting("db_init", "1");
+        }
+
         await R.exec("SET FOREIGN_KEY_CHECKS = 1"); // MySQL equivalent of "PRAGMA foreign_keys = ON"
         // await Database.knex.raw("SET FOREIGN_KEY_CHECKS = 1");
         console.log("working as expected ");
@@ -388,6 +402,7 @@ class Database {
         await R.getCell("SELECT 1 FROM DUAL");
         // Read the SQL file
         let text = fs.readFileSync(filename).toString();
+        console.log("sql ", text);
         // Remove all comments (--)
         let lines = text.split("\n");
         lines = lines.filter((line) => {

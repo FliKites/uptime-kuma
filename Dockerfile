@@ -1,36 +1,23 @@
-############################################
-# Build in Golang
-# Run npm run build-healthcheck-armv7 in the host first, another it will be super slow where it is building the armv7 healthcheck
-# Check file: builder-go.dockerfile
-############################################
-FROM louislam/uptime-kuma:builder-go AS build_healthcheck
+# Start with the node 16 base image
+FROM node:16
 
-############################################
-# Build in Node.js
-############################################
-FROM louislam/uptime-kuma:base-debian AS build
+# Set the working directory
 WORKDIR /app
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
-COPY .npmrc .npmrc
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-RUN npm ci --omit=dev
+# Copy over the package.json and yarn.lock files
+COPY package*.json ./
+
+# Install dependencies with Yarn
+RUN yarn install
+
+# Copy over the rest of the project
 COPY . .
-COPY --from=build_healthcheck /app/extra/healthcheck /app/extra/healthcheck
-RUN chmod +x /app/extra/entrypoint.sh
 
-############################################
-# ⭐ Main Image
-############################################
-FROM louislam/uptime-kuma:base-debian AS release
-WORKDIR /app
+# Build the project
+RUN yarn build
 
-# Copy app files from build layer
-COPY --from=build /app /app
+# Expose the desired port
+EXPOSE $PORT
 
-EXPOSE 3001
-VOLUME ["/app/data"]
-HEALTHCHECK --interval=60s --timeout=30s --start-period=180s --retries=5 CMD extra/healthcheck
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "extra/entrypoint.sh"]
-CMD ["node", "server/server.js"]
+# Run the project
+CMD ["yarn", "start"]
