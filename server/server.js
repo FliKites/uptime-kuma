@@ -921,10 +921,12 @@ let needSetup = false;
 
                 let list = await R.getAll(
                     `
-                    SELECT * FROM heartbeat
+                    SELECT *
+                    FROM heartbeat
                     WHERE monitor_id = ? AND
-                    time > DATETIME('now', '-' || ? || ' hours')
-                    ORDER BY time ASC
+                        time > NOW() - INTERVAL ? HOUR
+                    ORDER BY time ASC;
+
                 `,
                     [monitorID, period]
                 );
