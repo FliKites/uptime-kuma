@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `notification`(
   `user_id` INT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS `monitor_notification`(
-  `id` INT PRIMARY KEY NOT NULL,
+  `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `monitor_id` INT NOT NULL,
   `notification_id` INT NOT NULL,
   FOREIGN KEY (`monitor_id`) REFERENCES `monitor`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
