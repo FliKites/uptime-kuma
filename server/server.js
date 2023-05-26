@@ -792,7 +792,9 @@ let needSetup = false;
                 bean.hostname = monitor.hostname;
                 bean.game = monitor.game;
                 bean.maxretries = monitor.maxretries;
-                bean.port = parseInt(monitor.port);
+                bean.port = parseInt(monitor.port)
+                    ? parseInt(monitor.port)
+                    : null;
                 bean.keyword = monitor.keyword;
                 bean.ignoreTls = monitor.ignoreTls;
                 bean.expiryNotification = monitor.expiryNotification;
