@@ -1844,8 +1844,22 @@ async function initDatabase(testMode = false) {
     }
 
     log.info("server", "Connecting to the Database");
-    await Database.connect(testMode);
-    log.info("server", "Connected");
+    let reconnect = true;
+    while (reconnect) {
+        try {
+            await Database.connect(testMode);
+            log.info("server", "Connected");
+            console.log("db connection success");
+            reconnect = false;
+            break;
+        } catch (error) {
+            log.error(
+                "server",
+                "db connection failed retrying to connect to the db"
+            );
+            await new Promise((resolve) => setTimeout(resolve, 1000 * 15));
+        }
+    }
 
     // Patch the database
     await Database.patch();
