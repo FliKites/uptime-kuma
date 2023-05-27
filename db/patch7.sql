@@ -1,5 +1,5 @@
 -- You should not modify if this have pushed to Github, unless it does serious wrong with the db.
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 ALTER TABLE monitor
 	ADD dns_resolve_type VARCHAR(5);

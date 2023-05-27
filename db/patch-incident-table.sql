@@ -1,18 +1,13 @@
 -- You should not modify if this have pushed to Github, unless it does serious wrong with the db.
-BEGIN TRANSACTION;
-
-create table incident
+CREATE TABLE incident
 (
-    id INTEGER not null
-        constraint incident_pk
-            primary key autoincrement,
-    title VARCHAR(255) not null,
-    content TEXT not null,
-    style VARCHAR(30) default 'warning' not null,
-    created_date DATETIME default (DATETIME('now')) not null,
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    style VARCHAR(30) DEFAULT 'warning' NOT NULL,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     last_updated_date DATETIME,
-    pin BOOLEAN default 1 not null,
-    active BOOLEAN default 1 not null
+    pin BOOLEAN DEFAULT 1 NOT NULL,
+    active BOOLEAN DEFAULT 1 NOT NULL,
+    PRIMARY KEY (id)
 );
-
-COMMIT;

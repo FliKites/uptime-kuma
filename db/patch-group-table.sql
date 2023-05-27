@@ -1,30 +1,23 @@
 -- You should not modify if this have pushed to Github, unless it does serious wrong with the db.
-BEGIN TRANSACTION;
-
-create table `group`
+CREATE TABLE `group`
 (
-    id           INTEGER      not null
-        constraint group_pk
-            primary key autoincrement,
-    name         VARCHAR(255) not null,
-    created_date DATETIME              default (DATETIME('now')) not null,
-    public       BOOLEAN               default 0 not null,
-    active       BOOLEAN               default 1 not null,
-    weight       BOOLEAN      NOT NULL DEFAULT 1000
+    id           INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(255) NOT NULL,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    public       BOOLEAN DEFAULT 0 NOT NULL,
+    active       BOOLEAN DEFAULT 1 NOT NULL,
+    weight       INT NOT NULL DEFAULT 1000
 );
 
-CREATE TABLE [monitor_group]
+CREATE TABLE monitor_group
 (
-    [id]         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    [monitor_id] INTEGER                           NOT NULL REFERENCES [monitor] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
-    [group_id]   INTEGER                           NOT NULL REFERENCES [group] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
-    weight BOOLEAN NOT NULL DEFAULT 1000
+    id         INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    monitor_id INT NOT NULL,
+    group_id   INT NOT NULL,
+    weight     INT NOT NULL DEFAULT 1000,
+    FOREIGN KEY (monitor_id) REFERENCES monitor (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES `group` (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE INDEX [fk]
-    ON [monitor_group] (
-                        [monitor_id],
-                        [group_id]);
-
-
-COMMIT;
+CREATE INDEX fk
+    ON monitor_group (monitor_id, group_id);
