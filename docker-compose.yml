@@ -21,19 +21,16 @@ services:
     env_file:
       - .env
     environment:
+      # MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
+      MARIADB_MYSQL_LOCALHOST_USER: "root"
     ports:
       - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
-      - ./initdb:/docker-entrypoint-initdb.d
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "docker-entrypoint.sh & sleep 10 && mysql -uroot -p${DB_PASSWORD} ${DB_NAME} < /docker-entrypoint-initdb.d/grant.sql"
-      ]
+      - ./initdb/permission.sql:/docker-entrypoint-initdb.d/permission.sql
 
 volumes:
   uptime-kuma-data:

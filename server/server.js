@@ -722,7 +722,7 @@ let needSetup = false;
                 delete monitor.notificationIDList;
 
                 monitor.accepted_statuscodes_json = JSON.stringify(
-                    monitor.accepted_statuscodes
+                    monitor.accepted_statuscodes ?? ["200-299"]
                 );
                 delete monitor.accepted_statuscodes;
                 bean.import(monitor);
@@ -1543,7 +1543,9 @@ let needSetup = false;
 
                                 monitor.accepted_statuscodes_json =
                                     JSON.stringify(
-                                        monitor.accepted_statuscodes
+                                        monitor.accepted_statuscodes ?? [
+                                            "200-299",
+                                        ]
                                     );
                                 delete monitor.accepted_statuscodes;
 
@@ -1853,6 +1855,7 @@ async function initDatabase(testMode = false) {
             reconnect = false;
             break;
         } catch (error) {
+            console.log("error ", error);
             log.error(
                 "server",
                 "db connection failed retrying to connect to the db"

@@ -164,18 +164,18 @@ class Database {
         await R.exec("SET FOREIGN_KEY_CHECKS = 1"); // MySQL equivalent of "PRAGMA foreign_keys = ON"
         // await Database.knex.raw("SET FOREIGN_KEY_CHECKS = 1");
         console.log("working as expected ");
-        if (testMode) {
-            // Change to MEMORY
-            await R.exec(
-                "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED"
-            ); // Change the transaction isolation level for test mode
-        } else {
-            // Change to WAL
-            await R.exec(
-                "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
-            ); // Change the transaction isolation level for production mode
-        }
-        await R.exec("SET GLOBAL innodb_flush_log_at_trx_commit = 2"); // MySQL equivalent of "PRAGMA synchronous = FULL"
+        // if (testMode) {
+        //     // Change to MEMORY
+        //     await R.exec(
+        //         "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED"
+        //     ); // Change the transaction isolation level for test mode
+        // } else {
+        //     // Change to WAL
+        //     await R.exec(
+        //         "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
+        //     ); // Change the transaction isolation level for production mode
+        // }
+        // await R.exec("SET GLOBAL innodb_flush_log_at_trx_commit = 2"); // MySQL equivalent of "PRAGMA synchronous = FULL"
         if (!noLog) {
             const result = await R.getCell("SELECT VERSION()");
             console.log("result ", result);

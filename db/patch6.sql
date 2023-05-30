@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS monitor_dg_tmp (
     upside_down TINYINT(1) DEFAULT 0 NOT NULL,
     maxredirects INT DEFAULT 10 NOT NULL,
     -- accepted_statuscodes_json TEXT DEFAULT '["200-299"]' NOT NULL
-    accepted_statuscodes_json TEXT NOT NULL
+    accepted_statuscodes_json TEXT
 );
 
 INSERT INTO monitor_dg_tmp (
