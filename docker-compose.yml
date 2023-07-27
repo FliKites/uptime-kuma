@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  uptime-kuma:
+    build: .
+    image: tom/uptime-kuma
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: mariadb
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MARIADB_MYSQL_LOCALHOST_USER: "root"
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./initdb/permission.sql:/docker-entrypoint-initdb.d/permission.sql
+
+volumes:
+  uptime-kuma-data:
+  db-data:

@@ -6,7 +6,7 @@
 // Backend uses the compiled file util.js
 // Frontend uses util.ts
 
-import * as dayjs  from "dayjs";
+import * as dayjs from "dayjs";
 import * as timezone from "dayjs/plugin/timezone";
 import * as utc from "dayjs/plugin/utc";
 
@@ -27,7 +27,7 @@ export const SQL_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
 export const SQL_DATETIME_FORMAT_WITHOUT_SECOND = "YYYY-MM-DD HH:mm";
 
 export const MAX_INTERVAL_SECOND = 2073600; // 24 days
-export const MIN_INTERVAL_SECOND = 20; // 20 seconds
+export const MIN_INTERVAL_SECOND = 1; // 20 seconds
 
 /** Flip the status of s */
 export function flipStatus(s: number) {
@@ -47,7 +47,7 @@ export function flipStatus(s: number) {
  * @param ms Number of milliseconds to sleep for
  */
 export function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -73,7 +73,6 @@ export function debug(msg: any) {
 }
 
 class Logger {
-
     /**
      * UPTIME_KUMA_HIDE_LOG=debug_monitor,info_monitor
      *
@@ -83,7 +82,7 @@ class Logger {
      *     "info_monitor",
      *  ]
      */
-    hideLog : any = {
+    hideLog: any = {
         info: [],
         warn: [],
         error: [],
@@ -91,8 +90,13 @@ class Logger {
     };
 
     constructor() {
-        if (typeof process !== "undefined" && process.env.UPTIME_KUMA_HIDE_LOG) {
-            let list = process.env.UPTIME_KUMA_HIDE_LOG.split(",").map(v => v.toLowerCase());
+        if (
+            typeof process !== "undefined" &&
+            process.env.UPTIME_KUMA_HIDE_LOG
+        ) {
+            let list = process.env.UPTIME_KUMA_HIDE_LOG.split(",").map((v) =>
+                v.toLowerCase()
+            );
 
             for (let pair of list) {
                 // split first "_" only
@@ -115,7 +119,10 @@ class Logger {
      * @param level Log level. One of INFO, WARN, ERROR, DEBUG or can be customized.
      */
     log(module: string, msg: any, level: string) {
-        if (this.hideLog[level] && this.hideLog[level].includes(module.toLowerCase())) {
+        if (
+            this.hideLog[level] &&
+            this.hideLog[level].includes(module.toLowerCase())
+        ) {
             return;
         }
 
@@ -128,7 +135,10 @@ class Logger {
         } else {
             now = dayjs().format();
         }
-        const formattedMessage = (typeof msg === "string") ? `${now} [${module}] ${level}: ${msg}` : msg;
+        const formattedMessage =
+            typeof msg === "string"
+                ? `${now} [${module}] ${level}: ${msg}`
+                : msg;
 
         if (level === "INFO") {
             console.info(formattedMessage);
@@ -169,7 +179,7 @@ class Logger {
      * @param msg Message to write
      */
     error(module: string, msg: any) {
-       this.log(module, msg, "error");
+        this.log(module, msg, "error");
     }
 
     /**
@@ -178,7 +188,7 @@ class Logger {
      * @param msg Message to write
      */
     debug(module: string, msg: any) {
-       this.log(module, msg, "debug");
+        this.log(module, msg, "debug");
     }
 
     /**
@@ -188,19 +198,23 @@ class Logger {
      * @param msg The message to write
      */
     exception(module: string, exception: any, msg: any) {
-        let finalMessage = exception
+        let finalMessage = exception;
 
         if (msg) {
-            finalMessage = `${msg}: ${exception}`
+            finalMessage = `${msg}: ${exception}`;
         }
 
-        this.log(module, finalMessage , "error");
+        this.log(module, finalMessage, "error");
     }
 }
 
 export const log = new Logger();
 
-declare global { interface String { replaceAll(str: string, newStr: string): string; } }
+declare global {
+    interface String {
+        replaceAll(str: string, newStr: string): string;
+    }
+}
 
 /**
  * String.prototype.replaceAll() polyfill
@@ -212,7 +226,10 @@ export function polyfill() {
     if (!String.prototype.replaceAll) {
         String.prototype.replaceAll = function (str: string, newStr: string) {
             // If a regex pattern
-            if (Object.prototype.toString.call(str).toLowerCase() === "[object regexp]") {
+            if (
+                Object.prototype.toString.call(str).toLowerCase() ===
+                "[object regexp]"
+            ) {
                 return this.replace(str, newStr);
             }
 
@@ -234,7 +251,9 @@ export class TimeLogger {
      */
     print(name: string) {
         if (isDev && process.env.TIMELOGGER === "1") {
-            console.log(name + ": " + (dayjs().valueOf() - this.startTime) + "ms")
+            console.log(
+                name + ": " + (dayjs().valueOf() - this.startTime) + "ms"
+            );
         }
     }
 }
@@ -266,23 +285,26 @@ export function getRandomInt(min: number, max: number) {
  * browser equivalent implemented via window.crypto.getRandomValues()
  */
 let getRandomBytes = (
-    (typeof window !== 'undefined' && window.crypto)
-
-        // Browsers
-        ? function () {
-            return (numBytes: number) => {
-                let randomBytes = new Uint8Array(numBytes);
-                for (let i = 0; i < numBytes; i += 65536) {
-                    window.crypto.getRandomValues(randomBytes.subarray(i, i + Math.min(numBytes - i, 65536)));
-                }
-                return randomBytes;
-            };
-        }
-
-         // Node
-        : function() {
-            return require("crypto").randomBytes;
-        }
+    typeof window !== "undefined" && window.crypto
+        ? // Browsers
+          function () {
+              return (numBytes: number) => {
+                  let randomBytes = new Uint8Array(numBytes);
+                  for (let i = 0; i < numBytes; i += 65536) {
+                      window.crypto.getRandomValues(
+                          randomBytes.subarray(
+                              i,
+                              i + Math.min(numBytes - i, 65536)
+                          )
+                      );
+                  }
+                  return randomBytes;
+              };
+          }
+        : // Node
+          function () {
+              return require("crypto").randomBytes;
+          }
 )();
 
 /**
@@ -292,39 +314,37 @@ let getRandomBytes = (
  * @param max Maximum value of integer
  * @returns Cryptographically suitable random integer
  */
-export function getCryptoRandomInt(min: number, max: number):number {
-
+export function getCryptoRandomInt(min: number, max: number): number {
     // synchronous version of: https://github.com/joepie91/node-random-number-csprng
 
-    const range = max - min
-    if (range >= Math.pow(2, 32))
-        console.log("Warning! Range is too large.")
+    const range = max - min;
+    if (range >= Math.pow(2, 32)) console.log("Warning! Range is too large.");
 
-    let tmpRange = range
-    let bitsNeeded = 0
-    let bytesNeeded = 0
-    let mask = 1
+    let tmpRange = range;
+    let bitsNeeded = 0;
+    let bytesNeeded = 0;
+    let mask = 1;
 
     while (tmpRange > 0) {
-        if (bitsNeeded % 8 === 0) bytesNeeded += 1
-        bitsNeeded += 1
-        mask = mask << 1 | 1
-        tmpRange = tmpRange >>> 1
+        if (bitsNeeded % 8 === 0) bytesNeeded += 1;
+        bitsNeeded += 1;
+        mask = (mask << 1) | 1;
+        tmpRange = tmpRange >>> 1;
     }
 
-    const randomBytes = getRandomBytes(bytesNeeded)
-    let randomValue = 0
+    const randomBytes = getRandomBytes(bytesNeeded);
+    let randomValue = 0;
 
     for (let i = 0; i < bytesNeeded; i++) {
-	    randomValue |= randomBytes[i] << 8 * i
+        randomValue |= randomBytes[i] << (8 * i);
     }
 
     randomValue = randomValue & mask;
 
     if (randomValue <= range) {
-        return min + randomValue
+        return min + randomValue;
     } else {
-        return getCryptoRandomInt(min, max)
+        return getCryptoRandomInt(min, max);
     }
 }
 
@@ -335,9 +355,10 @@ export function getCryptoRandomInt(min: number, max: number):number {
  */
 export function genSecret(length = 64) {
     let secret = "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const charsLength = chars.length;
-    for ( let i = 0; i < length; i++ ) {
+    for (let i = 0; i < length; i++) {
         secret += chars.charAt(getCryptoRandomInt(0, charsLength - 1));
     }
     return secret;
@@ -380,11 +401,11 @@ export function parseTimeObject(time: string) {
         throw new Error("parseVueDatePickerTimeFormat: Invalid Time");
     }
 
-    let obj =  {
+    let obj = {
         hours: parseInt(array[0]),
         minutes: parseInt(array[1]),
         seconds: 0,
-    }
+    };
     if (array.length >= 3) {
         obj.seconds = parseInt(array[2]);
     }
@@ -394,17 +415,20 @@ export function parseTimeObject(time: string) {
 /**
  * @returns string e.g. 12:00
  */
-export function parseTimeFromTimeObject(obj : any) {
+export function parseTimeFromTimeObject(obj: any) {
     if (!obj) {
         return obj;
     }
 
     let result = "";
 
-    result += obj.hours.toString().padStart(2, "0") + ":" + obj.minutes.toString().padStart(2, "0")
+    result +=
+        obj.hours.toString().padStart(2, "0") +
+        ":" +
+        obj.minutes.toString().padStart(2, "0");
 
     if (obj.seconds) {
-        result += ":" +  obj.seconds.toString().padStart(2, "0")
+        result += ":" + obj.seconds.toString().padStart(2, "0");
     }
 
     return result;
@@ -415,21 +439,21 @@ export function parseTimeFromTimeObject(obj : any) {
  * @param input Date
  * @returns ISO Date time
  */
-export function isoToUTCDateTime(input : string) {
+export function isoToUTCDateTime(input: string) {
     return dayjs(input).utc().format(SQL_DATETIME_FORMAT);
 }
 
 /**
  * @param input
  */
-export function utcToISODateTime(input : string) {
+export function utcToISODateTime(input: string) {
     return dayjs.utc(input).toISOString();
 }
 
 /**
  * For SQL_DATETIME_FORMAT
  */
-export function utcToLocal(input : string, format = SQL_DATETIME_FORMAT) {
+export function utcToLocal(input: string, format = SQL_DATETIME_FORMAT) {
     return dayjs.utc(input).local().format(format);
 }
 
@@ -439,6 +463,6 @@ export function utcToLocal(input : string, format = SQL_DATETIME_FORMAT) {
  * @param format Format to return
  * @returns Date in requested format
  */
-export function localToUTC(input : string, format = SQL_DATETIME_FORMAT) {
+export function localToUTC(input: string, format = SQL_DATETIME_FORMAT) {
     return dayjs(input).utc().format(format);
 }

@@ -1,74 +1,71 @@
 -- You should not modify if this have pushed to Github, unless it does serious wrong with the db.
-PRAGMA foreign_keys = off;
+SET FOREIGN_KEY_CHECKS = 0;
 
-BEGIN TRANSACTION;
+START TRANSACTION;
 
-create table monitor_dg_tmp (
-	id INTEGER not null primary key autoincrement,
-	name VARCHAR(150),
-	active BOOLEAN default 1 not null,
-	user_id INTEGER references user on update cascade on delete
-	set
-		null,
-		interval INTEGER default 20 not null,
-		url TEXT,
-		type VARCHAR(20),
-		weight INTEGER default 2000,
-		hostname VARCHAR(255),
-		port INTEGER,
-		created_date DATETIME default (DATETIME('now')) not null,
-		keyword VARCHAR(255),
-		maxretries INTEGER NOT NULL DEFAULT 0,
-		ignore_tls BOOLEAN default 0 not null,
-		upside_down BOOLEAN default 0 not null,
-        maxredirects INTEGER default 10 not null,
-        accepted_statuscodes_json TEXT default '["200-299"]' not null
+CREATE TABLE IF NOT EXISTS monitor_dg_tmp (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(150),
+    active TINYINT(1) DEFAULT 1 NOT NULL,
+    user_id INT,
+    `interval` INT DEFAULT 20 NOT NULL,
+    url TEXT,
+    type VARCHAR(20),
+    weight INT DEFAULT 2000,
+    hostname VARCHAR(255),
+    port INT,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    keyword VARCHAR(255),
+    maxretries INT NOT NULL DEFAULT 0,
+    ignore_tls TINYINT(1) DEFAULT 0 NOT NULL,
+    upside_down TINYINT(1) DEFAULT 0 NOT NULL,
+    maxredirects INT DEFAULT 10 NOT NULL,
+    -- accepted_statuscodes_json TEXT DEFAULT '["200-299"]' NOT NULL
+    accepted_statuscodes_json TEXT
 );
 
-insert into
-	monitor_dg_tmp(
-		id,
-		name,
-		active,
-		user_id,
-		interval,
-		url,
-		type,
-		weight,
-		hostname,
-		port,
-        created_date,
-		keyword,
-		maxretries,
-		ignore_tls,
-		upside_down
-	)
-select
-	id,
-	name,
-	active,
-	user_id,
-	interval,
-	url,
-	type,
-	weight,
-	hostname,
-	port,
+INSERT INTO monitor_dg_tmp (
+    id,
+    name,
+    active,
+    user_id,
+    `interval`,
+    url,
+    type,
+    weight,
+    hostname,
+    port,
     created_date,
-	keyword,
-	maxretries,
-	ignore_tls,
-	upside_down
-from
-	monitor;
+    keyword,
+    maxretries,
+    ignore_tls,
+    upside_down
+)
+SELECT
+    id,
+    name,
+    active,
+    user_id,
+    `interval`,
+    url,
+    type,
+    weight,
+    hostname,
+    port,
+    created_date,
+    keyword,
+    maxretries,
+    ignore_tls,
+    upside_down
+FROM
+    monitor;
 
-drop table monitor;
+DROP TABLE monitor;
 
-alter table
-	monitor_dg_tmp rename to monitor;
+ALTER TABLE monitor_dg_tmp RENAME TO monitor;
 
-create index user_id on monitor (user_id);
+CREATE INDEX user_id ON monitor (user_id);
 
 COMMIT;
 
-PRAGMA foreign_keys = on;
+SET FOREIGN_KEY_CHECKS = 1;

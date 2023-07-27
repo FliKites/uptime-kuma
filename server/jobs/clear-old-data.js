@@ -23,21 +23,29 @@ const clearOldData = async () => {
     try {
         parsedPeriod = parseInt(period);
     } catch (_) {
-        log.warn("clearOldData", "Failed to parse setting, resetting to default..");
+        log.warn(
+            "clearOldData",
+            "Failed to parse setting, resetting to default.."
+        );
         await setSetting("keepDataPeriodDays", DEFAULT_KEEP_PERIOD, "general");
         parsedPeriod = DEFAULT_KEEP_PERIOD;
     }
 
     if (parsedPeriod < 1) {
-        log.info("clearOldData", `Data deletion has been disabled as period is less than 1. Period is ${parsedPeriod} days.`);
+        log.info(
+            "clearOldData",
+            `Data deletion has been disabled as period is less than 1. Period is ${parsedPeriod} days.`
+        );
     } else {
-
-        log.debug("clearOldData", `Clearing Data older than ${parsedPeriod} days...`);
+        log.debug(
+            "clearOldData",
+            `Clearing Data older than ${parsedPeriod} days...`
+        );
 
         try {
             await R.exec(
-                "DELETE FROM heartbeat WHERE time < DATETIME('now', '-' || ? || ' days') ",
-                [ parsedPeriod ]
+                "DELETE FROM heartbeat WHERE time < DATE_SUB(NOW(), INTERVAL ? DAY);",
+                [parsedPeriod]
             );
 
             await R.exec("PRAGMA optimize;");

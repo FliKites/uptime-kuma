@@ -1,40 +1,39 @@
 -- You should not modify if this have pushed to Github, unless it does serious wrong with the db.
 -- OK.... serious wrong, missing maxretries column
 -- Developers should patch it manually if you have missing the maxretries column
-PRAGMA foreign_keys=off;
+SET FOREIGN_KEY_CHECKS = 0;
 
-BEGIN TRANSACTION;
+START TRANSACTION;
 
-create table monitor_dg_tmp
-(
-    id INTEGER not null
-        primary key autoincrement,
+CREATE TABLE IF NOT EXISTS monitor_dg_tmp (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(150),
-    active BOOLEAN default 1 not null,
-    user_id INTEGER
-        references user
-                   on update cascade on delete set null,
-    interval INTEGER default 20 not null,
+    active TINYINT(1) DEFAULT 1 NOT NULL,
+    user_id INT,
+    `interval` INT DEFAULT 20 NOT NULL,
     url TEXT,
     type VARCHAR(20),
-    weight INTEGER default 2000,
+    weight INT DEFAULT 2000,
     hostname VARCHAR(255),
-    port INTEGER,
+    port INT,
     created_date DATETIME,
     keyword VARCHAR(255),
-    maxretries INTEGER NOT NULL DEFAULT 0,
-    ignore_tls BOOLEAN default 0 not null,
-    upside_down BOOLEAN default 0 not null
+    maxretries INT NOT NULL DEFAULT 0,
+    ignore_tls TINYINT(1) DEFAULT 0 NOT NULL,
+    upside_down TINYINT(1) DEFAULT 0 NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
-insert into monitor_dg_tmp(id, name, active, user_id, interval, url, type, weight, hostname, port, created_date, keyword, maxretries) select id, name, active, user_id, interval, url, type, weight, hostname, port, created_date, keyword, maxretries from monitor;
+INSERT INTO monitor_dg_tmp (id, name, active, user_id, `interval`, url, type, weight, hostname, port, created_date, keyword, maxretries)
+SELECT id, name, active, user_id, `interval`, url, type, weight, hostname, port, created_date, keyword, maxretries
+FROM monitor;
 
-drop table monitor;
+DROP TABLE monitor;
 
-alter table monitor_dg_tmp rename to monitor;
+ALTER TABLE monitor_dg_tmp RENAME TO monitor;
 
-create index user_id on monitor (user_id);
+CREATE INDEX user_id ON monitor (user_id);
 
 COMMIT;
 
-PRAGMA foreign_keys=on;
+SET FOREIGN_KEY_CHECKS = 1;
